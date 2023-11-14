@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { sortByDate } from "@/utils/photoSort";
+import Year from "../components/Year";
 
 type PhotosStateType = {
   loading: boolean;
@@ -76,20 +76,23 @@ const Home = () => {
   }, [photos.loading]);
 
   return (
-    <div className="bg-red-50 flex flex-col items-center h-screen">
+    <div className="grid grid-flow-row auto-cols-[minmax(0.1fr,_0.1fr)_minmax(0,_2fr)_minmax(0.1fr,_0.1fr)]">
       {photos.loading && <h1>Loading</h1>}
-      <h1>Photos</h1>
-      <section className="flex flex-wrap gap-x-2 gap-y-2 w-fit">
+      <Year years={["2019", "2020", "2021", "2022"]} />
+      <section className="grid grid-flow-row 2xl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 col-start-2 col-end-2 gap-4 w-fit py-12">
         {photos.data.map((photo) => (
           <Image
             src={photo.signedPhoto}
             key={photo.key}
             alt="picture"
-            height={0}
-            width={100}
-            className="rounded-md"
+            height={250}
+            width={250}
+            className="rounded-3xl"
           />
         ))}
+        {/* {new Array(7 - (photos.data.length % 7)).fill(0).map((a, i) => (
+          <span key={i + "-spacers-fill"} style={{ width: 250, height: 250 }} />
+        ))} */}
       </section>
     </div>
   );

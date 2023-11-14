@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setToken } from "../redux/features/authSlice";
-import { Inter } from "next/font/google";
-
-const inter = Inter({ subsets: ["latin"] });
 
 type AuthenticationStateType = {
   loading: boolean;
@@ -64,7 +61,7 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
     isValidSessionToken();
   }, []);
 
-  return <body className={inter.className}>{children}</body>;
+  return <body className="flex justify-center">{children}</body>;
 };
 
 export default Authenticated;
