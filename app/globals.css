@@ -12,3 +12,16 @@
 
 body {
 }
+
+.unblur {
+  animation: unblur 0.15s linear;
+}
+
+@keyframes unblur {
+  from {
+    filter: blur(5px);
+  }
+  to {
+    filter: blur(0);
+  }
+}

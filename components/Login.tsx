@@ -1,8 +1,8 @@
 "use client";
 
 import React, { SyntheticEvent, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { setToken } from "../redux/features/authSlice";
+import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
+import { setToken } from "../app/redux/features/authSlice";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -18,6 +18,7 @@ const Login = () => {
       body: formData,
     });
     const data = await res.json();
+    console.log(data);
     dispatch(setToken(data.authentication.sessionToken));
   };
 

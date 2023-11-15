@@ -3,8 +3,8 @@
 import { useGetSessionTokenClient } from "@/utils/useGetSessionTokenClient";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { setToken } from "../redux/features/authSlice";
+import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
+import { setToken } from "../app/redux/features/authSlice";
 
 type AuthenticationStateType = {
   loading: boolean;
@@ -61,7 +61,7 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
     isValidSessionToken();
   }, []);
 
-  return <body className="flex justify-center">{children}</body>;
+  return <body className="flex flex-col items-center gap-y-4">{children}</body>;
 };
 
 export default Authenticated;

@@ -1,17 +1,24 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Year from "../components/Year";
+import Year from "../../components/Year";
+import Photos from "../../components/Photos";
+import ItemView from "@/components/ItemView";
+import Search from "@/components/Search";
 
 type PhotosStateType = {
   loading: boolean;
-  data: PhotoType[];
+  data: Record<number, PhotoType>;
 };
 
 type PhotoType = {
   key: string;
   signedPhoto: string;
+  uploaderId?: string;
+  buffer: {
+    data: Array<number>;
+    type: string;
+  };
 };
 
 type PhotoKeyType = {
@@ -22,7 +29,6 @@ type PhotoKeyType = {
 
 const id = "b3e4b777-58bb-45c9-a383-e0f96ff26751";
 const type = "single";
-// const key = "IMG_1221TZ2023:07:14TTZ12:38:54";
 
 const Home = () => {
   const entries = useRef<string[]>([]);
@@ -30,6 +36,7 @@ const Home = () => {
     loading: true,
     data: [],
   });
+  const [view, setView] = useState<"small" | "medium" | "large">("large");
 
   const getPhotosKey = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/photos`, {
@@ -41,21 +48,26 @@ const Home = () => {
     return photosKey;
   };
 
-  const getPhotos = async (uploaderId: string, key: string) => {
+  const getPhotos = async (uploaderId: string, key: string, order: number) => {
     if (!entries.current.includes(key)) {
       entries.current.push(key);
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/get/photo?id=${uploaderId}&type=${type}&key=${key}`,
         {
           credentials: "include",
+          cache: "force-cache",
         }
       );
       const photo = (await res.json()) as PhotoType;
       if (photo.signedPhoto) {
-        setPhotos((prev) => ({
-          loading: false,
-          data: [...prev.data, photo],
-        }));
+        setPhotos((prev) => {
+          const data: Record<number, PhotoType> = { ...prev.data };
+          data[order] = { ...photo, uploaderId };
+          return {
+            loading: false,
+            data,
+          };
+        });
       }
     }
   };
@@ -64,8 +76,9 @@ const Home = () => {
     if (photos.loading) {
       (async function () {
         const photosKey = await getPhotosKey();
-        photosKey.forEach((photoKey) => {
-          getPhotos(photoKey.uploaderId, photoKey.key + "-thumbnail");
+        console.log(photosKey);
+        photosKey.forEach((photoKey, idx) => {
+          getPhotos(photoKey.uploaderId, photoKey.key + "-thumbnail", idx);
         });
         setPhotos((prev) => ({
           loading: false,
@@ -76,24 +89,14 @@ const Home = () => {
   }, [photos.loading]);
 
   return (
-    <div className="grid grid-flow-row auto-cols-[minmax(0.1fr,_0.1fr)_minmax(0,_2fr)_minmax(0.1fr,_0.1fr)]">
+    <div className="grid grid-flow-row auto-cols-[minmax(0,_fit-content)_minmax(0,_2fr)_minmax(0,_fit-content)] gap-4">
       {photos.loading && <h1>Loading</h1>}
-      <Year years={["2019", "2020", "2021", "2022"]} />
-      <section className="grid grid-flow-row 2xl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 col-start-2 col-end-2 gap-4 w-fit py-12">
-        {photos.data.map((photo) => (
-          <Image
-            src={photo.signedPhoto}
-            key={photo.key}
-            alt="picture"
-            height={250}
-            width={250}
-            className="rounded-3xl"
-          />
-        ))}
-        {/* {new Array(7 - (photos.data.length % 7)).fill(0).map((a, i) => (
-          <span key={i + "-spacers-fill"} style={{ width: 250, height: 250 }} />
-        ))} */}
-      </section>
+      <div className="col-start-2 col-end-3 flex justify-between">
+        <Year years={["2019", "2020", "2021", "2022"]} />
+        <Search />
+      </div>
+      <ItemView setView={setView} />
+      <Photos photos={photos.data} view={view} />
     </div>
   );
 };
