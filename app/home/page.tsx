@@ -43,6 +43,7 @@ const Home = () => {
       method: "POST",
       credentials: "include",
       body: JSON.stringify({ id, type: "userId" }),
+      cache: "no-cache",
     });
     const photosKey: PhotoKeyType[] = await res.json();
     return photosKey;

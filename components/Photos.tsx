@@ -2,7 +2,7 @@
 
 import { readPhotoData } from "@/utils/exifReader";
 import { ArrowCircleLeft, ArrowCircleRight, Close } from "@mui/icons-material";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, duration } from "@mui/material";
 import { gsap } from "gsap";
 import Image from "next/image";
 import React, {
@@ -10,7 +10,6 @@ import React, {
   MouseEvent,
   ReactNode,
   useEffect,
-  useRef,
   useState,
 } from "react";
 
@@ -228,15 +227,27 @@ const Photos = ({
   };
 
   const viewSize = {
-    small: [183.5, 2],
+    small: [183, 2],
     medium: [212, 1],
     large: [250, 0],
   };
 
+  useEffect(() => {
+    const tl = gsap.timeline();
+    tl.to("#thumbnail-image", {
+      width: viewSize[view][0],
+      height: viewSize[view][0],
+      duration: 0.2,
+      ease: "power4.out",
+    });
+    console.log(view);
+  }, [view]);
+
   return (
     <>
       <section
-        className={`flex flex-wrap max-w-[1676px] col-start-2 col-end-3 gap-4 w-fit py-12 px-12 rounded-lg`}
+        id="image-container"
+        className="flex flex-wrap max-w-[1676px] col-start-2 col-end-3 gap-4 w-fit py-12 px-12 rounded-lg ic-section relative h-auto"
         style={{
           backgroundColor: "#E0E9FF",
         }}
@@ -246,9 +257,9 @@ const Photos = ({
             src={photos[parseInt(order)].signedPhoto}
             key={photos[parseInt(order)].key}
             alt="picture"
-            height={viewSize[view][0]}
-            width={viewSize[view][0]}
-            className="rounded-3xl cursor-pointer shadow-md opacity-0"
+            height={250}
+            width={250}
+            className="rounded-3xl cursor-pointer shadow-md opacity-0 ti-image transition hover:-translate-y-1.5 hover:shadow-lg hover:shadow-neutral-400"
             onClick={(e) =>
               handleOnClickPhoto(e, photos[parseInt(order)], order)
             }
