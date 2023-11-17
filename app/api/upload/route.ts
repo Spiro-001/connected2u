@@ -10,13 +10,14 @@ export const POST = async (req: Request, res: Response) => {
         Cookie: req.headers.get("Cookie"),
       },
     });
-    if (formData.getAll("image")) {
+    if (formData.get("image")) {
       const res = await ax.post(
         `${process.env.NEXT_PUBLIC_PNGSERVER_URL}/upload/photo`,
         formData
       );
       return new Response(JSON.stringify(res.data), { status: 200 });
     } else if (formData.getAll("images")) {
+      console.log(formData.getAll("images"));
       const res = await ax.post(
         `${process.env.NEXT_PUBLIC_PNGSERVER_URL}/upload/photos`,
         formData

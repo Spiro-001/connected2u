@@ -39,12 +39,13 @@ const Home = () => {
   const [view, setView] = useState<"small" | "medium" | "large">("large");
 
   const getPhotosKey = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/photos`, {
+    const res = await fetch(`/api/photos`, {
       method: "POST",
       credentials: "include",
       body: JSON.stringify({ id, type: "userId" }),
       cache: "no-cache",
     });
+    console.log(res);
     const photosKey: PhotoKeyType[] = await res.json();
     return photosKey;
   };
@@ -53,7 +54,7 @@ const Home = () => {
     if (!entries.current.includes(key)) {
       entries.current.push(key);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/get/photo?id=${uploaderId}&type=${type}&key=${key}`,
+        `/api/get/photo?id=${uploaderId}&type=${type}&key=${key}`,
         {
           credentials: "include",
           cache: "force-cache",

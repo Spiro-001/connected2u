@@ -19,7 +19,6 @@ export const GET = async (req: Request, res: Response) => {
     const res = await ax.get(
       `${process.env.NEXT_PUBLIC_PNGSERVER_URL}/get/photo/${id}/${type}/${key}`
     );
-
     return new Response(JSON.stringify(res.data), { status: 200 });
   } catch (error) {
     // console.log(error);

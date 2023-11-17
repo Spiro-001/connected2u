@@ -114,14 +114,16 @@ const Photos = ({
     });
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/get/photo?id=${uploaderId}&type=${type}&key=${removeEXTKey}`,
+      `/api/get/photo?id=${uploaderId}&type=${type}&key=${removeEXTKey}`,
       {
         credentials: "include",
         cache: "force-cache",
       }
     );
     const photoData = (await res.json()) as PhotoType;
-    const exifData = readPhotoData(Buffer.from(photoData.buffer.data));
+    const exifData = photoData.buffer?.data
+      ? readPhotoData(Buffer.from(photoData.buffer.data))
+      : null;
     if (photoData.signedPhoto) {
       console.log(exifData);
       const width = exifData["Image Width"]?.value ?? 0;
@@ -178,7 +180,7 @@ const Photos = ({
           newPhoto.key.indexOf("-thumbnail")
         );
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/get/photo?id=${newPhoto.uploaderId}&type=${type}&key=${removeEXTKey}`,
+          `/api/get/photo?id=${newPhoto.uploaderId}&type=${type}&key=${removeEXTKey}`,
           {
             credentials: "include",
             cache: "force-cache",

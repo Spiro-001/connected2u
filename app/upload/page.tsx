@@ -17,6 +17,7 @@ const Upload = () => {
       } else if (files.length === 1) {
         formData.append("image", files[0]);
       }
+      console.log(formData.getAll("images"));
       setFiles(formData);
     }
   };
