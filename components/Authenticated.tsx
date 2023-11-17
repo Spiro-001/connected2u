@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetSessionTokenClient } from "@/utils/useGetSessionTokenClient";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
 import { setToken } from "../app/redux/features/authSlice";
@@ -22,6 +22,7 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const sessionToken = useGetSessionTokenClient();
+  const pathName = usePathname();
 
   const isValidSessionToken = async () => {
     const res = await fetch("/api/validate", {
@@ -53,7 +54,9 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
         loading: false,
         authenticated: true,
       });
-      router.push("/home");
+      if (pathName === "/") {
+        router.push("/home");
+      }
     }
   };
 

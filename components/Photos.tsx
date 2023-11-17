@@ -12,6 +12,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import ExifData from "./ExifData";
 
 type PhotoType = {
   order?: number;
@@ -39,28 +40,13 @@ const Photos = ({
   photos: Record<number, PhotoType>;
   view?: "small" | "medium" | "large";
 }) => {
-  useEffect(() => {
-    const tl = gsap.timeline();
-    tl.fromTo(
-      "#thumbnail-image",
-      {
-        opacity: 0,
-      },
-      {
-        opacity: 1,
-        stagger: 0.05,
-      }
-    );
-  }, [photos]);
-
   const loading = (
-    <div
-      className="bg-gray-600 bg-opacity-50 h-full items-center flex justify-center border-gray-600 border rounded-3xl"
-      style={{ width: 400 }}
-      id="highlighted-image"
-    >
-      <CircularProgress />
-    </div>
+    // <div
+    //   className="bg-gray-600 bg-opacity-50 w-full max-h-[800px] items-center flex justify-center border-gray-600 border rounded-3xl"
+    //   id="highlighted-image"
+    // >
+    <CircularProgress />
+    // </div>
   );
 
   let keyboardAction = {
@@ -88,7 +74,7 @@ const Photos = ({
         id="highlighted-image"
         key={photoData.key}
         alt="picture"
-        className="rounded-3xl object-contain h-full w-fit shadow-md"
+        className="rounded-3xl object-contain h-full w-full shadow-md max-w-[1440px] max-h-[800px]"
         height={height}
         width={width}
         style={{
@@ -100,6 +86,7 @@ const Photos = ({
           e.style.filter = "blur(0px)";
           e.className = e.className + " unblur";
         }}
+        loading="eager"
         priority
         unoptimized
       />
@@ -136,6 +123,7 @@ const Photos = ({
     const photoData = (await res.json()) as PhotoType;
     const exifData = readPhotoData(Buffer.from(photoData.buffer.data));
     if (photoData.signedPhoto) {
+      console.log(exifData);
       const width = exifData["Image Width"]?.value ?? 0;
       const height = exifData["Image Height"]?.value ?? 0;
       const imageNode = createImageNode(photoData, width, height);
@@ -173,7 +161,7 @@ const Photos = ({
       newPhoto = photos[newOrder];
       if (newPhoto) {
         await tl
-          .to("#highlighted-image", {
+          .to("#highlighted-image, #photo-data", {
             x: 100 * action * -1,
             opacity: 0,
             duration: 0.2,
@@ -197,6 +185,7 @@ const Photos = ({
           }
         );
         const photoData = (await res.json()) as PhotoType;
+        console.log(photoData);
         const exifData = readPhotoData(Buffer.from(photoData.buffer.data));
         if (photoData.signedPhoto) {
           const width = exifData["Image Width"]?.value ?? 0;
@@ -209,6 +198,10 @@ const Photos = ({
           };
           setSelectedPhoto(newSelectedPhoto);
         }
+        tl.to("#photo-data", {
+          opacity: 1,
+          x: 0,
+        });
       }
     }
   };
@@ -240,17 +233,26 @@ const Photos = ({
       duration: 0.2,
       ease: "power4.out",
     });
-    console.log(view);
   }, [view]);
+
+  const fadeIn = (e: HTMLImageElement) => {
+    const tl = gsap.timeline();
+    tl.fromTo(
+      e,
+      {
+        opacity: 0,
+      },
+      {
+        opacity: 1,
+      }
+    );
+  };
 
   return (
     <>
       <section
         id="image-container"
-        className="flex flex-wrap max-w-[1676px] col-start-2 col-end-3 gap-4 w-fit py-12 px-12 rounded-lg ic-section relative h-auto"
-        style={{
-          backgroundColor: "#E0E9FF",
-        }}
+        className="flex flex-wrap max-w-[1676px] col-start-2 col-end-3 gap-4 w-screen py-12 px-12 rounded-lg ic-section relative h-auto"
       >
         {Object.keys(photos).map((order) => (
           <Image
@@ -259,54 +261,97 @@ const Photos = ({
             alt="picture"
             height={250}
             width={250}
-            className="rounded-3xl cursor-pointer shadow-md opacity-0 ti-image transition hover:-translate-y-1.5 hover:shadow-lg hover:shadow-neutral-400"
+            placeholder="blur"
+            blurDataURL={
+              "data:image;base64," +
+              Buffer.from(photos[parseInt(order)].buffer.data).toString(
+                "base64"
+              )
+            }
+            className="rounded-3xl opacity-0 cursor-pointer shadow-md ti-image transition hover:-translate-y-1.5 hover:shadow-lg hover:shadow-neutral-400"
             onClick={(e) =>
               handleOnClickPhoto(e, photos[parseInt(order)], order)
             }
+            onLoadingComplete={(e) => fadeIn(e)}
             id="thumbnail-image"
           />
         ))}
       </section>
       <dialog
         id="highlight-selected-photo"
-        className="backdrop:bg-opacity-60 backdrop:bg-black bg-transparent outline-none w-full"
+        className="backdrop:bg-opacity-60 backdrop:bg-black bg-transparent outline-none w-full overflow-hidden"
         onKeyDown={handleKeyDown}
       >
         <div className="flex justify-center">
           <div className="flex items-center gap-x-8 relative">
-            <Close
-              sx={{
-                background: "transparent",
-                fill: "white",
-                height: 28,
-                width: 28,
-              }}
-              className="outline-none border-none cursor-pointer right-8 top-0 absolute"
-              onClick={handleClosePhoto}
-            />
-            <ArrowCircleLeft
-              sx={{
-                background: "transparent",
-                fill: "white",
-                height: 34,
-                width: 34,
-              }}
-              className="cursor-pointer"
-              onClick={(e) => handleNext(false)}
-            />
-            <div className="relative flex justify-center items-center w-fit h-screen max-w-[1440px] max-h-[800px] rounded-3xl">
+            {selectedPhoto.exif && (
+              <div
+                className="flex flex-col gap-y-2 absolute right-full top-0"
+                id="photo-data"
+              >
+                <h1 className="max-h-[250px] max-w-[450px] overflow-auto h-fit w-full rounded-md px-4 py-2 font-semibold bg-indigo-300 text-white">
+                  {(() => {
+                    const tzIndex = selectedPhoto.photo?.key
+                      .split("TTZ")[0]
+                      .split("")
+                      .reverse()
+                      .join("")
+                      .indexOf("ZT");
+                    const formatted = selectedPhoto.photo?.key.slice(
+                      0,
+                      (tzIndex ?? 2) - 2
+                    );
+                    return formatted;
+                  })()}
+                </h1>
+                <ExifData
+                  exifData={selectedPhoto.exif}
+                  fileSize={
+                    Buffer.from(selectedPhoto.photo?.buffer.data ?? [])
+                      .byteLength
+                  }
+                />
+              </div>
+            )}
+            {selectedPhoto.photo && (
+              <Close
+                sx={{
+                  background: "transparent",
+                  fill: "white",
+                  height: 28,
+                  width: 28,
+                }}
+                className="outline-none border-none cursor-pointer right-8 top-0 absolute"
+                onClick={handleClosePhoto}
+              />
+            )}
+            {selectedPhoto.photo && (
+              <ArrowCircleLeft
+                sx={{
+                  background: "transparent",
+                  fill: "white",
+                  height: 34,
+                  width: 34,
+                }}
+                className="cursor-pointer"
+                onClick={(e) => handleNext(false)}
+              />
+            )}
+            <div className="relative flex justify-center items-center max-w-[1080px] max-h-[800px] rounded-3xl">
               {selectedPhoto?.node}
             </div>
-            <ArrowCircleRight
-              sx={{
-                background: "transparent",
-                fill: "white",
-                height: 34,
-                width: 34,
-              }}
-              className="cursor-pointer"
-              onClick={(e) => handleNext(true)}
-            />
+            {selectedPhoto.photo && (
+              <ArrowCircleRight
+                sx={{
+                  background: "transparent",
+                  fill: "white",
+                  height: 34,
+                  width: 34,
+                }}
+                className="cursor-pointer"
+                onClick={(e) => handleNext(true)}
+              />
+            )}
           </div>
         </div>
       </dialog>

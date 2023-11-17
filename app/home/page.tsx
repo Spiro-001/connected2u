@@ -77,7 +77,6 @@ const Home = () => {
     if (photos.loading) {
       (async function () {
         const photosKey = await getPhotosKey();
-        console.log(photosKey);
         photosKey.forEach((photoKey, idx) => {
           getPhotos(photoKey.uploaderId, photoKey.key + "-thumbnail", idx);
         });
