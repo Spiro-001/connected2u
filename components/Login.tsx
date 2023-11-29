@@ -3,9 +3,11 @@
 import React, { SyntheticEvent, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
 import { setToken } from "../app/redux/features/authSlice";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
@@ -18,8 +20,8 @@ const Login = () => {
       body: formData,
     });
     const data = await res.json();
-    console.log(data);
     dispatch(setToken(data.authentication.sessionToken));
+    router.push("/home");
   };
 
   return (

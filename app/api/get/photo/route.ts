@@ -16,6 +16,7 @@ export const GET = async (req: Request, res: Response) => {
         Cookie: req.headers.get("Cookie"),
       },
     });
+
     const res = await ax.get(
       `${process.env.NEXT_PUBLIC_PNGSERVER_URL}/get/photo/${id}/${type}/${key}`
     );

@@ -8,6 +8,8 @@ export const POST = async (req: Request, res: Response) => {
       baseURL: process.env.NEXT_PUBLIC_URL,
       headers: {
         Cookie: req.headers.get("Cookie"),
+        "Content-Type":
+          "multipart/form-data; boundary=<calculated when request is sent>",
       },
     });
     if (formData.get("image")) {
@@ -17,7 +19,6 @@ export const POST = async (req: Request, res: Response) => {
       );
       return new Response(JSON.stringify(res.data), { status: 200 });
     } else if (formData.getAll("images")) {
-      console.log(formData.getAll("images"));
       const res = await ax.post(
         `${process.env.NEXT_PUBLIC_PNGSERVER_URL}/upload/photos`,
         formData

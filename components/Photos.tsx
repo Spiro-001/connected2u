@@ -124,8 +124,7 @@ const Photos = ({
     const exifData = photoData.buffer?.data
       ? readPhotoData(Buffer.from(photoData.buffer.data))
       : null;
-    if (photoData.signedPhoto) {
-      console.log(exifData);
+    if (photoData.signedPhoto && exifData) {
       const width = exifData["Image Width"]?.value ?? 0;
       const height = exifData["Image Height"]?.value ?? 0;
       const imageNode = createImageNode(photoData, width, height);

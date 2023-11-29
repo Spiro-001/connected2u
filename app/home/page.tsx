@@ -45,7 +45,6 @@ const Home = () => {
       body: JSON.stringify({ id, type: "userId" }),
       cache: "no-cache",
     });
-    console.log(res);
     const photosKey: PhotoKeyType[] = await res.json();
     return photosKey;
   };
@@ -57,7 +56,6 @@ const Home = () => {
         `/api/get/photo?id=${uploaderId}&type=${type}&key=${key}`,
         {
           credentials: "include",
-          cache: "force-cache",
         }
       );
       const photo = (await res.json()) as PhotoType;

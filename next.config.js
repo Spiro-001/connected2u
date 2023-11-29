@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["connected2u.s3.us-east-1.amazonaws.com"],
+    domains: [
+      "connected2u.s3.us-east-1.amazonaws.com",
+      "connected2u-dev.s3.us-east-1.amazonaws.com",
+    ],
   },
   async headers() {
     return [
@@ -13,7 +16,7 @@ const nextConfig = {
           // Allow for specific domains to have access or * for all
           {
             key: "Access-Control-Allow-Origin",
-            value: "https://evil-lemons-fetch.loca.lt",
+            value: process.env.NEXT_PUBLIC_URL,
             // DOES NOT WORK
             // value: process.env.ALLOWED_ORIGIN,
           },
