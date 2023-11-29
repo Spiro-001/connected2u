@@ -5,6 +5,7 @@ import { CircularProgress } from "@mui/material";
 import axios from "axios";
 import { gsap } from "gsap";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
 
 type FileObjectType = {
@@ -17,6 +18,11 @@ type FileObjectType = {
 const Upload = () => {
   const [files, setFiles] = useState<FormData | null>(null);
   const [renderFiles, setRenderFiles] = useState<FileObjectType[]>([]);
+  const [status, setStatus] = useState({
+    uploading: false,
+  });
+  const router = useRouter();
+
   const handleFiles = async (files: FileList | null) => {
     if (typeof window !== "undefined" && files && files?.length !== 0) {
       setFiles(null);
@@ -44,7 +50,7 @@ const Upload = () => {
                 size: Math.floor(file.size / 10000) / 100,
                 buffer: `data:image;base64,${buffer.toString("base64")}`,
               };
-              formData.append("images", file);
+              formData.append(`images[${x}]`, file);
               setRenderFiles((prev) => {
                 const copy = Array.from(prev);
                 copy[x] = fileObject;
@@ -54,7 +60,6 @@ const Upload = () => {
           }
         }
       } else if (files.length === 1) {
-        console.log(files);
         const fileBuffer = await files[0].arrayBuffer();
         let buffer = Buffer.from(fileBuffer);
         if (files[0].name.toLocaleLowerCase().includes("heic")) {
@@ -81,12 +86,16 @@ const Upload = () => {
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
     if (files) {
+      setStatus({
+        uploading: true,
+      });
       let fileList = files?.getAll("images") as File[];
       if (fileList) {
         // Multi
-        for (let x = 0; x < fileList.length; x++) {
+        for (let x = 0; x < renderFiles.length; x++) {
           const formData = new FormData();
-          const file = fileList[x];
+          const file = files.get(`images[${x}]`) as File;
+          if (!file) throw new Error("File does not exist.");
           formData.append("image", file);
           const tl = gsap.timeline();
           tl.to(
@@ -100,35 +109,54 @@ const Upload = () => {
             }
           );
 
-          const uploadPhotosAsync = async () => {
-            fetch("/api/upload", {
-              method: "POST",
-              credentials: "include",
-              body: formData,
+          await fetch("/api/upload", {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          })
+            .then(async (res) => {
+              const data = await res.json();
+              return data;
             })
-              .then(async (res) => {
-                const data = await res.json();
-                console.log(data);
-                return data;
-              })
-              .then((data) => {
-                console.log(data);
-              })
-              .finally(() => {
-                tl.to(
-                  `#${file.name.slice(
-                    0,
-                    file.name.indexOf(".")
-                  )}-image-upload-progress-bar`,
+            .then((data) => {
+              // console.log(data);
+            })
+            .finally(async () => {
+              await tl.to(
+                `#${file.name.slice(
+                  0,
+                  file.name.indexOf(".")
+                )}-image-upload-progress-bar`,
+                {
+                  height: 6,
+                  width: "100%",
+                }
+              );
+              await tl
+                .to(
+                  `#${
+                    file.name.slice(0, file.name.indexOf(".")) +
+                    "-image-upload-container"
+                  }`,
                   {
-                    height: 6,
-                    width: "100%",
+                    y: -50,
+                    opacity: 0,
                   }
-                );
-              });
-          };
-          uploadPhotosAsync();
+                )
+                .then(() => {
+                  setRenderFiles((prev) => {
+                    const copy = prev.filter((e, idx) => e.id !== x);
+                    return copy;
+                  });
+                });
+            });
         }
+        setFiles(null);
+        setRenderFiles([]);
+        setStatus({
+          uploading: false,
+        });
+        router.push("/home");
       }
       let file = files?.get("image") as File;
       if (file) {
@@ -152,12 +180,16 @@ const Upload = () => {
           body: formData,
         })
           .then((res) => {
-            console.log(res);
             return res.json();
           })
-          .then((data) => console.log(data))
-          .finally(() => {
-            tl.to(
+          .then((data) => {
+            // console.log(data)
+          })
+          .finally(async () => {
+            setStatus({
+              uploading: false,
+            });
+            await tl.to(
               `#${file.name.slice(
                 0,
                 file.name.indexOf(".")
@@ -167,6 +199,12 @@ const Upload = () => {
                 width: "100%",
               }
             );
+            setRenderFiles([]);
+            setFiles(null);
+            setStatus({
+              uploading: false,
+            });
+            router.push("/home");
           });
       }
     }
@@ -210,11 +248,15 @@ const Upload = () => {
         >
           Upload Photos
         </div>
-        <div className="flex flex-wrap gap-2 border border-neutral-200 px-2 py-2 rounded-md">
+        <div className="flex flex-wrap gap-2 border border-neutral-200 px-2 py-2 rounded-md w-full min-h-[241px]">
           {renderFiles.map((file) => (
             <div
               key={file.id + "-" + file.name}
               className="flex flex-col w-fit text-sm gap-y-1 items-center max-w-[175px]"
+              id={
+                file.name.slice(0, file.name.indexOf(".")) +
+                "-image-upload-container"
+              }
             >
               <span className="ml-auto px-1 text-xs bg-yellow-100 rounded-sm">
                 {file.size}MB
@@ -250,10 +292,16 @@ const Upload = () => {
         </div>
         <button
           type="submit"
-          className="ml-auto px-2 bg-green-300 text-white font-semibold rounded-md"
+          className="ml-auto px-2 bg-green-300 text-white font-semibold rounded-md flex justify-center items-center"
           hidden={renderFiles.length === 0}
+          style={{ width: 69, height: 24 }}
+          disabled={status.uploading}
         >
-          Upload
+          {status.uploading ? (
+            <CircularProgress size={18} sx={{ color: "white" }} />
+          ) : (
+            "Upload"
+          )}
         </button>
       </form>
     </div>

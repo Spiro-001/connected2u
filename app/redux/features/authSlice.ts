@@ -1,8 +1,10 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
+type SessionTokenType = { sessionToken: string; id: string };
+
 interface AuthState {
-  sessionToken: string | null;
+  sessionToken: SessionTokenType | null;
 }
 
 const initialState: AuthState = {
@@ -16,7 +18,7 @@ export const authSlice = createSlice({
     refreshToken: (state) => {
       // GET NEW SESSION TOKEN
     },
-    setToken: (state, action: PayloadAction<string | null>) => {
+    setToken: (state, action: PayloadAction<SessionTokenType | null>) => {
       state.sessionToken = action.payload;
     },
   },

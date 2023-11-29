@@ -5,10 +5,21 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
 import { setToken } from "../app/redux/features/authSlice";
+import { getSession } from "next-auth/react";
 
 type AuthenticationStateType = {
   loading: boolean;
   authenticated: boolean | null;
+};
+
+type SessionType = {
+  user: {
+    name: string;
+    email: string;
+    id: string;
+    sessionToken: string;
+  } | null;
+  expires: string | null;
 };
 
 const Authenticated = ({ children }: { children: React.ReactNode }) => {
@@ -25,37 +36,47 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
   const pathName = usePathname();
 
   const isValidSessionToken = async () => {
-    const res = await fetch("/api/validate", {
-      method: "POST",
-      body: JSON.stringify({
-        id: "b3e4b777-58bb-45c9-a383-e0f96ff26751",
-        sessionToken,
-      }),
-    });
-    if (!res.ok) {
-      dispatch(setToken(null));
-      setAuthentication({
-        loading: false,
-        authenticated: false,
+    const session = (await getSession()) as SessionType;
+    console.log(session);
+    if (session && session.user) {
+      console.log(session, sessionToken);
+      const res = await fetch("/api/validate", {
+        method: "POST",
+        body: JSON.stringify({
+          id: session.user.id,
+          sessionToken: session.user.sessionToken,
+        }),
       });
-    }
-    const data = await res.json();
-    if (!data.validate) {
-      // Validation failed need new sessionToken
-      dispatch(setToken(null));
-      setAuthentication({
-        loading: false,
-        authenticated: false,
-      });
-      router.push("/");
-    } else {
-      dispatch(setToken(data.validate.authentication.sessionToken));
-      setAuthentication({
-        loading: false,
-        authenticated: true,
-      });
-      if (pathName === "/") {
-        router.push("/home");
+      if (!res.ok) {
+        dispatch(setToken(null));
+        setAuthentication({
+          loading: false,
+          authenticated: false,
+        });
+      }
+      const data = await res.json();
+      if (!data.validate) {
+        // Validation failed need new sessionToken
+        dispatch(setToken(null));
+        setAuthentication({
+          loading: false,
+          authenticated: false,
+        });
+        router.push("/");
+      } else {
+        dispatch(
+          setToken({
+            sessionToken: data.validate.authentication.sessionToken,
+            id: data.validate.id,
+          })
+        );
+        setAuthentication({
+          loading: false,
+          authenticated: true,
+        });
+        if (pathName === "/") {
+          router.push("/home");
+        }
       }
     }
   };

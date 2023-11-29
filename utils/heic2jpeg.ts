@@ -26,7 +26,6 @@ export const convert = async (
     return copy;
   });
   const heic2any = require("heic2any");
-  const fileReader = new FileReader();
   const HEICtoJPEG = (await heic2any({
     blob: file,
     toType: "image/jpeg",
@@ -34,7 +33,6 @@ export const convert = async (
   })) as Blob;
   const arrayBuffer = await HEICtoJPEG.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  console.log(ExifReader.load(buffer), file);
   const newFile = new File([await file.arrayBuffer()], file.name, {
     type: "image/heic",
   });
@@ -44,7 +42,8 @@ export const convert = async (
     size: Math.floor(file.size / 10000) / 100,
     buffer: `data:image;base64,${buffer.toString("base64")}`,
   };
-  formData.append(`image${multi ? "s" : ""}`, newFile);
+
+  formData.append(`image${multi ? `s[${idx}]` : ""}`, newFile);
   setRenderFiles((prev) => {
     const copy = Array.from(prev);
     copy[idx] = fileObject;

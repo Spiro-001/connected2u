@@ -4,6 +4,7 @@ import React, { SyntheticEvent, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
 import { setToken } from "../app/redux/features/authSlice";
 import { useRouter } from "next/navigation";
+import { signIn, signOut } from "next-auth/react";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -14,14 +15,13 @@ const Login = () => {
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email");
     const password = formData.get("password");
-    const res = await fetch("/api/login", {
-      credentials: "include",
-      method: "POST",
-      body: formData,
+    const user = await signIn("credentials", {
+      username: email,
+      password: password,
+      redirect: true,
+      callbackUrl: "/home",
     });
-    const data = await res.json();
-    dispatch(setToken(data.authentication.sessionToken));
-    router.push("/home");
+    // router.push("/home");
   };
 
   return (
