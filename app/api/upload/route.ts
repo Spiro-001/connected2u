@@ -28,6 +28,8 @@ export const POST = async (req: Request, res: Response) => {
   } catch (error) {
     // console.log(error);
     const err = error as AxiosError;
-    return new Response(JSON.stringify(err.response?.data), { status: 400 });
+    return new Response(JSON.stringify(err.response?.data), {
+      status: err.response?.status ?? 400,
+    });
   }
 };

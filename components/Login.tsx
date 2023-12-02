@@ -15,11 +15,9 @@ const Login = () => {
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email");
     const password = formData.get("password");
-    const user = await signIn("credentials", {
+    signIn("credentials", {
       username: email,
       password: password,
-      redirect: true,
-      callbackUrl: "/home",
     });
     // router.push("/home");
   };

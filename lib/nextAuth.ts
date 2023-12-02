@@ -1,8 +1,17 @@
 import { NextAuthOptions, Session, User } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { cookies } from "next/headers";
+import { randomBytes, randomUUID } from "crypto";
 
 type UserType = {
+  id: string;
+  email: string;
+  name: string;
+  authentication: string;
+};
+
+type SignInType = {
   id: string;
   email: string;
   name: string;
@@ -13,11 +22,7 @@ type TokenType = {
   name: string;
   email: string;
   sub: string;
-  authentication: {
-    salt: string;
-    password: string;
-    sessionToken: string;
-  };
+  authentication: string;
   iat: number;
   exp: number;
   jti: string;
@@ -51,6 +56,8 @@ export const authOptions: NextAuthOptions = {
           body: formData,
         });
         const user = await res.json();
+        const sessionToken = user.authentication.sessionToken;
+        user.authentication = sessionToken ?? "";
         if (res.ok) {
           // Any object returned will be saved in `user` property of the JWT
           return user;
@@ -66,6 +73,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       // Validate user
+
+      // cookies().set({
+      //   name: "CONNECTED2U_AUTH_TOKEN",
+      //   value: (user as UserType).authentication,
+      //   maxAge: 24 * 60 * 60,
+      // });
       return true;
     },
     async redirect({ url, baseUrl }) {
@@ -79,7 +92,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.sub,
-          sessionToken: (token as TokenType).authentication.sessionToken ?? "",
+          sessionToken: (token as TokenType).authentication ?? "",
         },
       };
       return insertedSession;
@@ -90,6 +103,7 @@ export const authOptions: NextAuthOptions = {
       if (user && (user as UserType).authentication) {
         token.authentication = (user as UserType).authentication;
       }
+      console.log(token, 123);
       return token;
     },
   },

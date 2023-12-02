@@ -1,5 +1,6 @@
 "use client";
 
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -11,6 +12,7 @@ const Nav = () => {
       <button onClick={(e) => router.push("/upload")} className="ml-auto">
         Upload
       </button>
+      <button onClick={(e) => signOut()}>Sign out</button>
     </nav>
   );
 };

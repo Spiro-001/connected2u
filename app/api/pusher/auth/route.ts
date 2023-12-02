@@ -1,5 +1,6 @@
 import { pusherServer } from "@/lib/pusher";
 import { parsePusher } from "@/utils/parsePusher";
+import { AxiosError } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -23,7 +24,9 @@ export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     );
     return new Response(JSON.stringify(authResponse), { status: 200 });
   } catch (error) {
-    console.log(error);
-    return new Response(JSON.stringify("error"), { status: 403 });
+    const err = error as AxiosError;
+    return new Response(JSON.stringify("error"), {
+      status: err.response?.status ?? 403,
+    });
   }
 };
