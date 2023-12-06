@@ -37,9 +37,11 @@ const type = "single";
 const Photos = ({
   photos,
   view = "large",
+  photosExist,
 }: {
   photos: Record<number, PhotoType>;
   view?: "small" | "medium" | "large";
+  photosExist: boolean;
 }) => {
   const loading = (
     // <div
@@ -249,6 +251,7 @@ const Photos = ({
       }
     );
   };
+  console.log(photosExist);
 
   return (
     <>
@@ -256,6 +259,7 @@ const Photos = ({
         id="image-container"
         className="flex flex-wrap max-w-[1676px] col-start-2 col-end-3 gap-4 w-full rounded-lg ic-section relative h-auto"
       >
+        {!photosExist && <h1>{"You don't have any photos yet!"}</h1>}
         {Object.keys(photos).map((order) => (
           <Image
             src={photos[parseInt(order)].signedPhoto}

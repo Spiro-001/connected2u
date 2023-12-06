@@ -47,6 +47,7 @@ const Home = () => {
     loading: true,
     data: [],
   });
+  const [photosExist, setPhotosExist] = useState(false);
   const [view, setView] = useState<"small" | "medium" | "large">("large");
 
   const getPhotosKey = async () => {
@@ -59,6 +60,8 @@ const Home = () => {
         cache: "no-cache",
       });
       const photosKey: PhotoKeyType[] = await res.json();
+      if (photosKey.length === 0) setPhotosExist(false);
+      else setPhotosExist(true);
       return photosKey;
     }
   };
@@ -113,7 +116,9 @@ const Home = () => {
       </div>
       <div className="flex w-full gap-x-10">
         <ItemView setView={setView} />
-        <Photos photos={photos.data} view={view} />
+        {!photos.loading && (
+          <Photos photos={photos.data} view={view} photosExist={photosExist} />
+        )}
       </div>
     </div>
   );
