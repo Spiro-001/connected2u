@@ -7,7 +7,6 @@ import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
 import { setToken } from "../app/redux/features/authSlice";
 import { getSession } from "next-auth/react";
 import { useCookies } from "next-client-cookies";
-import { cookies } from "next/headers";
 
 type AuthenticationStateType = {
   loading: boolean;
@@ -36,10 +35,10 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useAppDispatch();
   const sessionToken = useGetSessionTokenClient();
   const pathName = usePathname();
+  const cookies = useCookies();
 
   const isValidSessionToken = async () => {
     const session = (await getSession()) as SessionType;
-    console.log(session);
     const user = session?.user ?? { id: null, sessionToken: "" };
     const res = await fetch("/api/validate", {
       method: "POST",
@@ -48,10 +47,9 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
         sessionToken: user.sessionToken,
       }),
     });
-    cookies().set({
-      name: "CONNECTED2U_AUTH_TOKEN",
-      value: user.sessionToken,
-      maxAge: 24 * 60 * 60,
+    // FIX COOKIES NEED TO SET FOR AUTH FOR POST
+    cookies.set("CONNECTED2U_AUTH_TOKEN", user.sessionToken, {
+      expires: 30,
     });
     if (!res.ok) {
       dispatch(setToken(null));
@@ -61,7 +59,6 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
       });
     }
     const data = await res.json();
-    console.log(data);
     if (!data.validate) {
       // Validation failed need new sessionToken
       dispatch(setToken(null));
@@ -91,7 +88,11 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
     isValidSessionToken();
   }, []);
 
-  return <body className="flex flex-col items-center gap-y-4">{children}</body>;
+  return (
+    <body className="flex flex-col items-center gap-y-4 h-screen">
+      {children}
+    </body>
+  );
 };
 
 export default Authenticated;

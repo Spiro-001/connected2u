@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
 import { setToken } from "../app/redux/features/authSlice";
 import { useRouter } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
+import { TextField } from "@mui/material";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -23,14 +24,31 @@ const Login = () => {
   };
 
   return (
-    <form className="flex flex-col" onSubmit={handleSubmit}>
+    <form
+      className="flex flex-col border gap-y-2 px-4 py-5 rounded-md shadow-md"
+      onSubmit={handleSubmit}
+    >
       <label htmlFor="email">
-        <input placeholder="email" name="email" />
+        <TextField
+          id="outlined-basic"
+          label="Email"
+          variant="outlined"
+          name="email"
+        />
       </label>
       <label htmlFor="password">
-        <input placeholder="password" type="text" name="password" />
+        <TextField
+          id="outlined-basic"
+          label="Password"
+          variant="outlined"
+          name="password"
+          type="password"
+        />
       </label>
-      <button className="w-fit" type="submit">
+      <button
+        className="w-fit ml-auto bg-blue-400 rounded-md text-white font-bold py-0.5 px-3"
+        type="submit"
+      >
         Login
       </button>
     </form>

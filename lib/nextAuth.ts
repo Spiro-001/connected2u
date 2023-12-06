@@ -73,12 +73,6 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       // Validate user
-
-      // cookies().set({
-      //   name: "CONNECTED2U_AUTH_TOKEN",
-      //   value: (user as UserType).authentication,
-      //   maxAge: 24 * 60 * 60,
-      // });
       return true;
     },
     async redirect({ url, baseUrl }) {
@@ -103,7 +97,6 @@ export const authOptions: NextAuthOptions = {
       if (user && (user as UserType).authentication) {
         token.authentication = (user as UserType).authentication;
       }
-      console.log(token, 123);
       return token;
     },
   },

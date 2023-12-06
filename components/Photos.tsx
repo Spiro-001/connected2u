@@ -163,7 +163,7 @@ const Photos = ({
       newPhoto = photos[newOrder];
       if (newPhoto) {
         await tl
-          .to("#highlighted-image, #photo-data", {
+          .to("#highlighted-image, #photo-data, #map-container", {
             x: 100 * action * -1,
             opacity: 0,
             duration: 0.2,
@@ -254,7 +254,7 @@ const Photos = ({
     <>
       <section
         id="image-container"
-        className="flex flex-wrap max-w-[1676px] col-start-2 col-end-3 gap-4 w-full py-12 px-12 rounded-lg ic-section relative h-auto"
+        className="flex flex-wrap max-w-[1676px] col-start-2 col-end-3 gap-4 w-full rounded-lg ic-section relative h-auto"
       >
         {Object.keys(photos).map((order) => (
           <Image
@@ -284,7 +284,7 @@ const Photos = ({
         className="backdrop:bg-opacity-60 backdrop:bg-black bg-transparent outline-none w-full overflow-hidden"
         onKeyDown={handleKeyDown}
       >
-        <div className="flex justify-center flex-wrap gap-y-4">
+        <div className="flex justify-center flex-wrap gap-y-4 gap-x-4">
           {selectedPhoto.exif && (
             <div className="flex flex-col gap-y-2" id="photo-data">
               <h1 className="max-h-[250px] max-w-[450px] overflow-auto h-fit w-full rounded-md px-4 py-2 font-semibold bg-indigo-300 text-white">
@@ -352,7 +352,10 @@ const Photos = ({
             )}
           </div>
           {selectedPhoto.exif && (
-            <div className="mt-auto">
+            <div
+              className="mt-auto max-w-[400px] max-h-[200px] w-full h-screen"
+              id="map-container"
+            >
               <Map exifData={selectedPhoto.exif} />
             </div>
           )}

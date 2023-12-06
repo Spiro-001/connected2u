@@ -105,14 +105,16 @@ const Home = () => {
   }, [photos.loading]);
 
   return (
-    <div className="grid grid-flow-row auto-cols-[minmax(0,_fit-content)_minmax(0,_2fr)_minmax(0,_fit-content)] px-4">
+    <div className="flex flex-col px-4 gap-y-4" style={{ width: "90%" }}>
       {photos.loading && <h1>Loading</h1>}
-      <div className="col-start-2 col-end-3 flex justify-between">
+      <div className="col-start-2 col-end-3 flex justify-between items-start">
         <Year years={["2019", "2020", "2021", "2022"]} />
         <Search setPhotos={setPhotos} />
       </div>
-      <ItemView setView={setView} />
-      <Photos photos={photos.data} view={view} />
+      <div className="flex w-full gap-x-10">
+        <ItemView setView={setView} />
+        <Photos photos={photos.data} view={view} />
+      </div>
     </div>
   );
 };

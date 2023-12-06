@@ -6,7 +6,7 @@ const ItemView = ({
   setView: Dispatch<SetStateAction<"small" | "medium" | "large">>;
 }) => {
   return (
-    <ul className="flex flex-col font-bold gap-y-1 text-white sticky top-8 h-fit w-fit pr-4 pt-4">
+    <ul className="flex flex-col font-bold gap-y-1 text-white sticky top-14 h-fit w-fit py-12">
       <button
         className="bg-pink-300 rounded-md w-10 h-10"
         onClick={(e) => setView("small")}

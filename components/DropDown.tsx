@@ -49,7 +49,7 @@ const DropDown = ({
       <ul
         style={style}
         onClick={handleOpenMenu}
-        className="absolute border border-neutral-200 rounded-md overflow-hidden bg-white"
+        className="absolute border border-neutral-200 rounded-md overflow-hidden bg-white shadow-md w-full min-w-[83px]"
       >
         {!openMenu.open && (
           <span className="pl-4 pr-6">{openMenu.selected}</span>

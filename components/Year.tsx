@@ -8,7 +8,7 @@ const Year = ({ years }: { years: string[] }) => {
         {years.map((year) => (
           <li
             key={year + "-btn-srt"}
-            className="bg-purple-100 px-12 py-2 rounded-md"
+            className="bg-purple-100 px-6 py-1 rounded-md h-fit cursor-pointer"
           >
             {year}
           </li>
@@ -16,7 +16,7 @@ const Year = ({ years }: { years: string[] }) => {
       </ul>
       <DropDown
         options={years}
-        className="flex flex-col lg:hidden cursor-pointer border border-neutral-200 h-fit"
+        className="flex flex-col lg:hidden cursor-pointer"
       />
     </>
   );
