@@ -21,6 +21,7 @@ const Users = () => {
   });
   const auth = useAppSelector((state) => state.auth.sessionToken);
   const dispatch = useAppDispatch();
+
   useEffect(() => {
     const getUsers = async () => {
       const result = await fetch("/api/users", {
