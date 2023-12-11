@@ -33,7 +33,7 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
   const auth = useAppSelector((state) => state.auth.sessionToken);
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const sessionToken = useGetSessionTokenClient();
+  // const sessionToken = useGetSessionTokenClient();
   const pathName = usePathname();
   const cookies = useCookies();
 
