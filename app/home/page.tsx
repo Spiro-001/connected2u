@@ -109,7 +109,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col px-4 gap-y-4" style={{ width: "90%" }}>
-      {photos.loading && <h1>Loading</h1>}
+      {/* {photos.loading && <h1>Loading</h1>} */}
       <div className="col-start-2 col-end-3 flex justify-between items-start">
         <Year years={["2019", "2020", "2021", "2022"]} />
         <Search setPhotos={setPhotos} />

@@ -71,7 +71,7 @@ const Upload = () => {
             size: Math.floor(files[0].size / 10000) / 100,
             buffer: `data:image;base64,${buffer.toString("base64")}`,
           };
-          formData.append("image", files[0]);
+          formData.append("images[0]", files[0]);
           setRenderFiles((prev) => {
             const copy = Array.from(prev);
             copy[0] = fileObject;
@@ -99,10 +99,9 @@ const Upload = () => {
           formData.append("image", file);
           const tl = gsap.timeline();
           tl.to(
-            `#${file.name.slice(
-              0,
-              file.name.indexOf(".")
-            )}-image-upload-progress-bar`,
+            `#img-${file.name
+              .slice(0, file.name.indexOf("."))
+              .replace("_", "-")}-image-upload-progress-bar`,
             {
               height: 6,
               width: "15%",
@@ -123,10 +122,9 @@ const Upload = () => {
             })
             .finally(async () => {
               await tl.to(
-                `#${file.name.slice(
-                  0,
-                  file.name.indexOf(".")
-                )}-image-upload-progress-bar`,
+                `#img-${file.name
+                  .slice(0, file.name.indexOf("."))
+                  .replace("_", "-")}-image-upload-progress-bar`,
                 {
                   height: 6,
                   width: "100%",
@@ -134,7 +132,7 @@ const Upload = () => {
               );
               await tl
                 .to(
-                  `#${
+                  `#img-${
                     file.name.slice(0, file.name.indexOf(".")) +
                     "-image-upload-container"
                   }`,
@@ -165,7 +163,7 @@ const Upload = () => {
         formData.append("image", file);
         const tl = gsap.timeline();
         tl.to(
-          `#${file.name.slice(
+          `#img-${file.name.slice(
             0,
             file.name.indexOf(".")
           )}-image-upload-progress-bar`,
@@ -190,7 +188,7 @@ const Upload = () => {
               uploading: false,
             });
             await tl.to(
-              `#${file.name.slice(
+              `#img-${file.name.slice(
                 0,
                 file.name.indexOf(".")
               )}-image-upload-progress-bar`,
@@ -254,7 +252,8 @@ const Upload = () => {
               key={file.id + "-" + file.name}
               className="flex flex-col w-fit text-sm gap-y-1 items-center max-w-[175px]"
               id={
-                file.name.slice(0, file.name.indexOf(".")) +
+                "img-" +
+                file.name.slice(0, file.name.indexOf(".")).replace("_", "-") +
                 "-image-upload-container"
               }
             >
@@ -268,7 +267,11 @@ const Upload = () => {
                   width={175}
                   alt="picture-thumbnail-upload"
                   id={
-                    file.name.slice(0, file.name.indexOf(".")) + "-image-upload"
+                    "img-" +
+                    file.name
+                      .slice(0, file.name.indexOf("."))
+                      .replace("_", "-") +
+                    "-image-upload"
                   }
                   className="object-cover rounded-md aspect-square"
                 />
@@ -282,7 +285,8 @@ const Upload = () => {
               </span>
               <span
                 id={
-                  file.name.slice(0, file.name.indexOf(".")) +
+                  "img-" +
+                  file.name.slice(0, file.name.indexOf(".")).replace("_", "-") +
                   "-image-upload-progress-bar"
                 }
                 className="w-full rounded-full bg-blue-300 mr-auto"

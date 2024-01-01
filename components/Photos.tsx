@@ -43,14 +43,7 @@ const Photos = ({
   view?: "small" | "medium" | "large";
   photosExist: boolean;
 }) => {
-  const loading = (
-    // <div
-    //   className="bg-gray-600 bg-opacity-50 w-full max-h-[800px] items-center flex justify-center border-gray-600 border rounded-3xl"
-    //   id="highlighted-image"
-    // >
-    <CircularProgress />
-    // </div>
-  );
+  const loading = <CircularProgress />;
 
   let keyboardAction = {
     ArrowLeft: () => {},
@@ -189,7 +182,6 @@ const Photos = ({
           }
         );
         const photoData = (await res.json()) as PhotoType;
-        console.log(photoData);
         const exifData = readPhotoData(Buffer.from(photoData.buffer.data));
         if (photoData.signedPhoto) {
           const width = exifData["Image Width"]?.value ?? 0;
@@ -251,7 +243,6 @@ const Photos = ({
       }
     );
   };
-  console.log(photosExist);
 
   return (
     <>

@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../app/redux/hooks";
 import { setToken } from "../app/redux/features/authSlice";
 import { getSession } from "next-auth/react";
 import { useCookies } from "next-client-cookies";
+import Login from "./Login";
 
 type AuthenticationStateType = {
   loading: boolean;
@@ -90,7 +91,15 @@ const Authenticated = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <body className="flex flex-col items-center gap-y-4 h-screen">
-      {children}
+      {!authentication.loading && authentication.authenticated === null && (
+        <h1>Loading</h1>
+      )}
+      {!authentication.loading && authentication.authenticated && children}
+      {!authentication.loading && !authentication.authenticated && (
+        <main className="flex items-center justify-center h-full">
+          <Login />
+        </main>
+      )}
     </body>
   );
 };
