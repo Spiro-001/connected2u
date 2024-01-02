@@ -274,6 +274,7 @@ const Photos = ({
           />
         ))}
       </section>
+      {/* FOCUS POPUP PHOTO */}
       <dialog
         id="highlight-selected-photo"
         className="backdrop:bg-opacity-60 backdrop:bg-black bg-transparent outline-none w-full overflow-hidden"
@@ -282,17 +283,17 @@ const Photos = ({
         <div className="flex justify-center flex-wrap gap-y-4 gap-x-4">
           {selectedPhoto.exif && (
             <div className="flex flex-col gap-y-2" id="photo-data">
-              <h1 className="max-h-[250px] max-w-[450px] overflow-auto h-fit w-full rounded-md px-4 py-2 font-semibold bg-indigo-300 text-white">
+              <h1 className="max-h-[250px] max-w-[300px] overflow-auto h-fit w-full rounded-md px-4 py-2 font-semibold bg-indigo-300 text-white">
                 {(() => {
-                  const tzIndex = selectedPhoto.photo?.key
-                    .split("TTZ")[0]
-                    .split("")
-                    .reverse()
-                    .join("")
-                    .indexOf("ZT");
+                  // const tzIndex = selectedPhoto.photo?.key
+                  //   .split("TTZ")[0]
+                  //   .split("")
+                  //   .reverse()
+                  //   .join("")
+                  //   .indexOf("ZT");
                   const formatted = selectedPhoto.photo?.key.slice(
                     0,
-                    (tzIndex ?? 2) - 2
+                    selectedPhoto.photo?.key.length - 23
                   );
                   return formatted;
                 })()}

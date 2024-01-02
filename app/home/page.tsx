@@ -7,6 +7,7 @@ import ItemView from "@/components/ItemView";
 import Search from "@/components/Search";
 import { getSession } from "next-auth/react";
 import { ISODateString } from "next-auth";
+import LoadingPhotos from "@/components/LoadingPhotos";
 
 type PhotosStateType = {
   loading: boolean;
@@ -119,6 +120,7 @@ const Home = () => {
         {!photos.loading && (
           <Photos photos={photos.data} view={view} photosExist={photosExist} />
         )}
+        {photos.loading && <LoadingPhotos view={view} />}
       </div>
     </div>
   );
